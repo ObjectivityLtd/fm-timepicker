@@ -340,6 +340,7 @@
 							controller.$setValidity( "required", false );
 						}
 						controller.$setViewValue( null );
+						return;
 					}
 
 					// Check if the string in the input box represents a valid date according to the rules set through parameters in our scope.
