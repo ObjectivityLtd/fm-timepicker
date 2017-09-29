@@ -311,6 +311,7 @@
 
 					if( timeValid || time === null ) {
 						// If the time is valid, store the time string in the scope used by the input box.
+
 						scope.time = time;
 					}
 				};
@@ -392,7 +393,7 @@
 					if ( timeString === null) {
 						return true;
 					}
-					
+
 					if( !timeString ) {
 						return false;
 					}
@@ -578,7 +579,7 @@
 				scope.increment = function increment() {
 					if( scope.fmIsOpen ) {
 						scope.modelPreview.add( scope.fmInterval );
-						scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
+						scope.updateWithModelPreview();
 
 					} else {
 						scope.ngModel.add( scope.fmInterval );
@@ -591,8 +592,7 @@
 				scope.decrement = function decrement() {
 					if( scope.fmIsOpen ) {
 						scope.modelPreview.subtract( scope.fmInterval );
-						scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
-
+						scope.updateWithModelPreview();
 					} else {
 						scope.ngModel.subtract( scope.fmInterval );
 						scope.ngModel = scope.ensureTimeIsWithinBounds( scope.ngModel );
@@ -600,6 +600,11 @@
 					}
 					scope.activeIndex = Math.max( 0, scope.activeIndex - 1 );
 				};
+
+				scope.updateWithModelPreview = function updateWithModelPreview () {
+					scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
+					scope.time = scope.modelPreview.format( scope.fmFormat );
+				}
 
 				/**
 				 * Check if the value in the input control is a valid timestamp.
@@ -630,6 +635,7 @@
 								scope.ngModel  = scope.modelPreview;
 								scope.fmIsOpen = false;
 							}
+							scope.update();
 							break;
 
 						case 27:
@@ -641,7 +647,7 @@
 							// Page up
 							openPopup();
 							scope.modelPreview.subtract( scope.fmLargeInterval );
-							scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
+							scope.updateWithModelPreview();
 							scope.activeIndex  = Math.max( 0,
 								scope.activeIndex - scope.largeIntervalIndexJump );
 							break;
@@ -650,7 +656,7 @@
 							// Page down
 							openPopup();
 							scope.modelPreview.add( scope.fmLargeInterval );
-							scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
+							scope.updateWithModelPreview();
 							scope.activeIndex  = Math.min( scope.largestPossibleIndex,
 								scope.activeIndex + scope.largeIntervalIndexJump );
 							break;
@@ -747,5 +753,5 @@
 
 angular.module('fmTimepicker').run(['$templateCache', function($templateCache) {
   $templateCache.put("fmTimepicker.html",
-    "<div><div class=\"input-group\"><span class=\"input-group-btn\" ng-if=\"fmStyle === 'sequential'\"><button type=\"button\" class=\"{{fmBtnClass}}\" ng-click=\"decrement()\" ng-disabled=\"activeIndex === 0 || fmDisabled\"><span class=\"{{fmIconClasses.minus}}\"></span></button></span> <input type=\"text\" class=\"form-control\" ng-model=\"time\" ng-keyup=\"handleKeyboardInput( $event )\" ng-change=\"update()\" ng-disabled=\"fmDisabled\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"{{fmBtnClass}}\" ng-if=\"fmStyle === 'sequential'\" ng-click=\"increment()\" ng-disabled=\"activeIndex === largestPossibleIndex || fmDisabled\"><span class=\"{{fmIconClasses.plus}}\"></span></button> <button type=\"button\" class=\"{{fmBtnClass}}\" ng-if=\"fmStyle === 'dropdown'\" ng-class=\"{active : fmIsOpen}\" fm-timepicker-toggle ng-disabled=\"fmDisabled\"><span class=\"{{fmIconClasses.time}}\"></span></button></span></div><div class=\"dropdown\" ng-if=\"fmStyle === 'dropdown' && fmIsOpen\" ng-class=\"{open : fmIsOpen}\"><ul class=\"dropdown-menu form-control\" style=\"height:auto; max-height:160px; overflow-y:scroll\" ng-mousedown=\"handleListClick( $event )\"><!-- Fill an empty array with time values between start and end time with the given interval, then iterate over that array. --><li ng-repeat=\"time in ( $parent.dropDownOptions = ( [] | fmTimeInterval:fmStartTime:fmEndTime:fmInterval ) )\" ng-click=\"select( time, $index )\" ng-class=\"{active : activeIndex === $index}\"><!-- For each item, check if it is the last item. If it is, communicate the index to a method in the scope. -->{{$last ? largestPossibleIndexIs( $index ) : angular.noop()}}<!-- Render a link into the list item, with the formatted time value. --><a href=\"#\" ng-click=\"preventDefault( $event )\">{{time | fmTimeFormat:fmFormat}}</a></li></ul></div></div>");
+    "<div><div class=\"input-group\"><span class=\"input-group-btn\" ng-if=\"fmStyle === 'sequential'\"><button type=\"button\" class=\"{{fmBtnClass}}\" ng-click=\"decrement()\" ng-disabled=\"activeIndex === 0 || fmDisabled\"><span class=\"{{fmIconClasses.minus}}\"></span></button></span> <input type=\"text\" class=\"form-control\" ng-model=\"time\" ng-keyup=\"handleKeyboardInput( $event )\" ng-disabled=\"fmDisabled\"> <span class=\"input-group-btn\"><button type=\"button\" class=\"{{fmBtnClass}}\" ng-if=\"fmStyle === 'sequential'\" ng-click=\"increment()\" ng-disabled=\"activeIndex === largestPossibleIndex || fmDisabled\"><span class=\"{{fmIconClasses.plus}}\"></span></button> <button type=\"button\" class=\"{{fmBtnClass}}\" ng-if=\"fmStyle === 'dropdown'\" ng-class=\"{active : fmIsOpen}\" fm-timepicker-toggle ng-disabled=\"fmDisabled\"><span class=\"{{fmIconClasses.time}}\"></span></button></span></div><div class=\"dropdown\" ng-if=\"fmStyle === 'dropdown' && fmIsOpen\" ng-class=\"{open : fmIsOpen}\"><ul class=\"dropdown-menu form-control\" style=\"height:auto; max-height:160px; overflow-y:scroll\" ng-mousedown=\"handleListClick( $event )\"><!-- Fill an empty array with time values between start and end time with the given interval, then iterate over that array. --><li ng-repeat=\"time in ( $parent.dropDownOptions = ( [] | fmTimeInterval:fmStartTime:fmEndTime:fmInterval ) )\" ng-click=\"select( time, $index )\" ng-class=\"{active : activeIndex === $index}\"><!-- For each item, check if it is the last item. If it is, communicate the index to a method in the scope. -->{{$last ? largestPossibleIndexIs( $index ) : angular.noop()}}<!-- Render a link into the list item, with the formatted time value. --><a href=\"#\" ng-click=\"preventDefault( $event )\">{{time | fmTimeFormat:fmFormat}}</a></li></ul></div></div>");
 }]);

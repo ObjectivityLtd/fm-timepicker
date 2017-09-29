@@ -390,7 +390,7 @@
 					if ( timeString === null) {
 						return true;
 					}
-					
+
 					if( !timeString ) {
 						return false;
 					}
@@ -576,7 +576,7 @@
 				scope.increment = function increment() {
 					if( scope.fmIsOpen ) {
 						scope.modelPreview.add( scope.fmInterval );
-						scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
+						scope.updateWithModelPreview();
 
 					} else {
 						scope.ngModel.add( scope.fmInterval );
@@ -589,8 +589,7 @@
 				scope.decrement = function decrement() {
 					if( scope.fmIsOpen ) {
 						scope.modelPreview.subtract( scope.fmInterval );
-						scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
-
+						scope.updateWithModelPreview();
 					} else {
 						scope.ngModel.subtract( scope.fmInterval );
 						scope.ngModel = scope.ensureTimeIsWithinBounds( scope.ngModel );
@@ -598,6 +597,11 @@
 					}
 					scope.activeIndex = Math.max( 0, scope.activeIndex - 1 );
 				};
+
+				scope.updateWithModelPreview = function updateWithModelPreview () {
+					scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
+					scope.time = scope.modelPreview.format( scope.fmFormat );
+				}
 
 				/**
 				 * Check if the value in the input control is a valid timestamp.
@@ -628,6 +632,7 @@
 								scope.ngModel  = scope.modelPreview;
 								scope.fmIsOpen = false;
 							}
+							scope.update();
 							break;
 
 						case 27:
@@ -639,7 +644,7 @@
 							// Page up
 							openPopup();
 							scope.modelPreview.subtract( scope.fmLargeInterval );
-							scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
+							scope.updateWithModelPreview();
 							scope.activeIndex  = Math.max( 0,
 								scope.activeIndex - scope.largeIntervalIndexJump );
 							break;
@@ -648,7 +653,7 @@
 							// Page down
 							openPopup();
 							scope.modelPreview.add( scope.fmLargeInterval );
-							scope.modelPreview = scope.ensureTimeIsWithinBounds( scope.modelPreview );
+							scope.updateWithModelPreview();
 							scope.activeIndex  = Math.min( scope.largestPossibleIndex,
 								scope.activeIndex + scope.largeIntervalIndexJump );
 							break;

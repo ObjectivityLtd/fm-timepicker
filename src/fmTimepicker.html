@@ -5,7 +5,7 @@
 				<span class="{{fmIconClasses.minus}}"></span>
 			</button>
 		</span>
-		<input type="text" class="form-control" ng-model="time" ng-keyup="handleKeyboardInput( $event )" ng-change="update()" ng-disabled="fmDisabled">
+		<input type="text" class="form-control" ng-model="time" ng-keyup="handleKeyboardInput( $event )" ng-disabled="fmDisabled">
 		<span class="input-group-btn">
 			<button type="button" class="{{fmBtnClass}}" ng-if="fmStyle === 'sequential'" ng-click="increment()" ng-disabled="activeIndex === largestPossibleIndex || fmDisabled">
 				<span class="{{fmIconClasses.plus}}"></span>
