@@ -669,6 +669,13 @@
 							openPopup();
 							scope.increment();
 							break;
+						
+						case 8:
+							// Backspace
+							if (!scope.time) {
+								validateView();
+							}
+							break;
 
 						default:
 					}
