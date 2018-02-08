@@ -671,7 +671,8 @@
 							break;
 						
 						case 8:
-							// Backspace
+						case 127:
+							// Backspace and delete
 							if (!scope.time) {
 								validateView();
 							}
