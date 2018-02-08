@@ -673,7 +673,7 @@
 							break;
 						
 						case 8:
-						case 127:
+						case 46:
 							// Backspace and delete
 							if (!scope.time) {
 								validateView();
